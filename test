@@ -1,4 +1,5 @@
 #include <avr/pgmspace.h>
+#include <string.h>
 const PROGMEM char forward[] =  {0x05, 0x10, 0x00, 0x00, 0x00, 0x01, 0x02, 0x00, 0x01, 0x55, 0x50};
 const PROGMEM char backward[] = {0x05, 0x10, 0x00, 0x00, 0x00, 0x01, 0x02, 0x00, 0x02, 0x15, 0x51};
 const PROGMEM char freq10[] =   {0x05, 0x10, 0x00, 0x01, 0x00, 0x01, 0x02, 0x03, 0xE8, 0x95, 0xFF};
@@ -9,6 +10,7 @@ char output;
 int k;
 int End;
 String i;
+String f = "forw";
 
 void setup() {
   Serial.begin(9600);
@@ -25,34 +27,38 @@ void loop() {
   }
   
   if (Serial.available() == 0 && End == 1) {
+//    char s[sizeof(i)];
+//    i.toCharArray(s, sizeof(s));
+//    char e = i[1];
+//    Serial.print(s);
     if (i == "f") {
       for (k = 0; k < 11; k++) {
-      output = pgm_read_word_near(forward + k);
-      Serial.print(output);
+        output = pgm_read_word_near(forward + k);
+        Serial.print(output);
       }
     }
     if (i == "b") {
       for (k = 0; k < 11; k++) {
-      output = pgm_read_word_near(backward + k);
-      Serial.print(output);
+        output = pgm_read_word_near(backward + k);
+        Serial.print(output);
       }  
     }
     if (i == "0") {
       for (k = 0; k < 11; k++) {
-      output = pgm_read_word_near(freq10 + k);
-      Serial.print(output);
+        output = pgm_read_word_near(freq10 + k);
+        Serial.print(output);
       }  
     }
     if (i == "5") {
       for (k = 0; k < 11; k++) {
-      output = pgm_read_word_near(freq15 + k);
-      Serial.print(output);
+        output = pgm_read_word_near(freq15 + k);
+        Serial.print(output);
       }
     }
     if (i == "s") {
       for (k = 0; k < 11; k++) {
-      output = pgm_read_word_near(stay + k);
-      Serial.print(output);
+        output = pgm_read_word_near(stay + k);
+        Serial.print(output);
       }
     } 
     
