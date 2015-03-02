@@ -25,7 +25,20 @@ void loop() {
     switch (i.charAt(0)) {
       case 0x05:
         Serial.println("05");
-        i = "";
+        if (i.length() == 2) { 
+        switch (i.charAt(1)) {
+          case 0x10:
+            Serial.println("10");
+            i = "";
+            break;
+          case 0x00:
+            Serial.println("00");
+            i = "";
+            break;
+          default:
+            Serial.println("def05");
+            i = "";
+        }}
         break;
       case 0x04:
         Serial.println("04");
