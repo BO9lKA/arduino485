@@ -1,0 +1,87 @@
+#include <avr/pgmspace.h>
+const PROGMEM char forward[] =  {0x05, 0x10, 0x00, 0x00, 0x00, 0x01, 0x02, 0x00, 0x01, 0x55, 0x50};
+const PROGMEM char backward[] = {0x05, 0x10, 0x00, 0x00, 0x00, 0x01, 0x02, 0x00, 0x02, 0x15, 0x51};
+const PROGMEM char freq10[] =   {0x05, 0x10, 0x00, 0x01, 0x00, 0x01, 0x02, 0x03, 0xE8, 0x95, 0xFF};
+const PROGMEM char freq15[] =   {0x05, 0x10, 0x00, 0x01, 0x00, 0x01, 0x02, 0x05, 0xDC, 0x97, 0x88};
+const PROGMEM char stay[] =     {0x05, 0x10, 0x00, 0x00, 0x00, 0x01, 0x02, 0x00, 0x00, 0x94, 0x90};
+
+int k;
+int End;
+char b;
+char output;
+String i;
+
+void setup() {
+  Serial.begin(9600);
+}
+
+void loop() {
+
+  while (Serial.available()) {
+//    i += Serial.read();
+    b = Serial.read();
+    i += b;
+
+    switch (i.charAt(0)) {
+      case 0x05:
+        Serial.println("05");
+        i = "";
+        break;
+      case 0x04:
+        Serial.println("04");
+        i = "";
+        break;
+      default:
+        Serial.println("default");
+        i = "";
+    }   
+    
+//  End = 0;
+  }
+  
+  if (Serial.available() == 0 && End == 1) {
+//    char s[sizeof(i)];
+//    i.toCharArray(s, sizeof(s));
+//    char e = i[1];
+
+    if (i.length() >= 4) { 
+    }
+  
+    if (i.charAt(0) == 0x05) {
+      if (i.charAt(1) == 0x10) {
+        if (i.charAt(2) == 0x00) {
+          if (i.charAt(3) == 0x00) {
+            for (k = 0; k < 11; k++) {
+            output = pgm_read_word_near(forward + k);
+            Serial.print(output);
+            i = "";
+            }           
+          }
+          else if (i.charAt(3) == 0x01) {
+            for (k = 0; k < 11; k++) {
+            output = pgm_read_word_near(freq10 + k);
+            Serial.print(output);
+            i = "";
+            }              
+          }
+          else {
+            i = "";
+          }
+        }
+      }
+    }
+    
+    else if (i.charAt(0) == 0x04) {
+      Serial.println("04");
+      i = "";
+    }    
+
+    else {
+      Serial.println(i);
+      i = "";
+    }
+
+    End = 0;
+  } 
+  
+}
