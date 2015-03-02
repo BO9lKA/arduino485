@@ -24,19 +24,27 @@ void loop() {
 
     switch (i.charAt(0)) {
       case 0x05:
-        Serial.println("05");
+//        Serial.println("05");
         if (i.length() == 2) { 
         switch (i.charAt(1)) {
           case 0x10:
-            Serial.println("10");
+//            Serial.println("10");
+            for (k = 0; k < 11; k++) {
+              output = pgm_read_word_near(forward + k);
+              Serial.print(output);
+            }  
             i = "";
             break;
           case 0x00:
-            Serial.println("00");
+//            Serial.println("00");
+            for (k = 0; k < 11; k++) {
+              output = pgm_read_word_near(backward + k);
+              Serial.print(output);
+            } 
             i = "";
             break;
           default:
-            Serial.println("def05");
+//            Serial.println("def05");
             i = "";
         }}
         break;
@@ -45,7 +53,7 @@ void loop() {
         i = "";
         break;
       default:
-        Serial.println("default");
+//        Serial.println("default");
         i = "";
     }   
     
