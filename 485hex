@@ -1,4 +1,6 @@
 #include <avr/pgmspace.h>
+#include <SoftwareSerial.h>
+SoftwareSerial Serial485(2, 3);
 const PROGMEM char forward[] =  {0x05, 0x10, 0x00, 0x00, 0x00, 0x01, 0x02, 0x00, 0x01, 0x55, 0x50};
 const PROGMEM char backward[] = {0x05, 0x10, 0x00, 0x00, 0x00, 0x01, 0x02, 0x00, 0x02, 0x15, 0x51};
 const PROGMEM char freq10[] =   {0x05, 0x10, 0x00, 0x01, 0x00, 0x01, 0x02, 0x03, 0xE8, 0x95, 0xFF};
@@ -58,51 +60,6 @@ void loop() {
     }   
     
 //  End = 0;
-  }
-  
-  if (Serial.available() == 0 && End == 1) {
-//    char s[sizeof(i)];
-//    i.toCharArray(s, sizeof(s));
-//    char e = i[1];
-
-    if (i.length() >= 4) { 
-    }
-  
-    if (i.charAt(0) == 0x05) {
-      if (i.charAt(1) == 0x10) {
-        if (i.charAt(2) == 0x00) {
-          if (i.charAt(3) == 0x00) {
-            for (k = 0; k < 11; k++) {
-            output = pgm_read_word_near(forward + k);
-            Serial.print(output);
-            i = "";
-            }           
-          }
-          else if (i.charAt(3) == 0x01) {
-            for (k = 0; k < 11; k++) {
-            output = pgm_read_word_near(freq10 + k);
-            Serial.print(output);
-            i = "";
-            }              
-          }
-          else {
-            i = "";
-          }
-        }
-      }
-    }
-    
-    else if (i.charAt(0) == 0x04) {
-      Serial.println("04");
-      i = "";
-    }    
-
-    else {
-      Serial.println(i);
-      i = "";
-    }
-
-    End = 0;
   } 
   
 }
