@@ -1,6 +1,6 @@
 #include <avr/pgmspace.h>
 #include <SoftwareSerial.h>
-SoftwareSerial Serial485(2, 3);
+SoftwareSerial Serial485(10, 11);
 const PROGMEM char forward[] =  {0x05, 0x10, 0x00, 0x00, 0x00, 0x01, 0x02, 0x00, 0x01, 0x55, 0x50};
 const PROGMEM char backward[] = {0x05, 0x10, 0x00, 0x00, 0x00, 0x01, 0x02, 0x00, 0x02, 0x15, 0x51};
 const PROGMEM char freq10[] =   {0x05, 0x10, 0x00, 0x01, 0x00, 0x01, 0x02, 0x03, 0xE8, 0x95, 0xFF};
@@ -14,7 +14,14 @@ char output;
 String i;
 
 void setup() {
+  pinMode(8, OUTPUT);
+  pinMode(9, OUTPUT);
+  pinMode(13, OUTPUT);
+  digitalWrite(8, LOW);
+  digitalWrite(9, LOW);
+  digitalWrite(13, LOW);
   Serial.begin(9600);
+  Serial485.begin(9600);
 }
 
 void loop() {
@@ -31,19 +38,35 @@ void loop() {
         switch (i.charAt(1)) {
           case 0x10:
 //            Serial.println("10");
+            digitalWrite(9, HIGH);
+            digitalWrite(13, HIGH);
             for (k = 0; k < 11; k++) {
               output = pgm_read_word_near(forward + k);
-              Serial.print(output);
+              Serial485.print(output);
             }  
             i = "";
+//delayMicroseconds (660);
+while (!(UCSR0A & (1 << UDRE0)))  // Wait for empty transmit buffer
+UCSR0A |= 1 << TXC0;  // mark transmission not complete
+while (!(UCSR0A & (1 << TXC0)));   // Wait for the transmission to complete
+            digitalWrite(9, LOW);
+            digitalWrite(13, LOW);
             break;
           case 0x00:
 //            Serial.println("00");
+            digitalWrite(9, HIGH);
+            digitalWrite(13, HIGH);
             for (k = 0; k < 11; k++) {
               output = pgm_read_word_near(backward + k);
-              Serial.print(output);
+              Serial485.print(output);
             } 
             i = "";
+//delayMicroseconds (660);
+while (!(UCSR0A & (1 << UDRE0)))  // Wait for empty transmit buffer
+UCSR0A |= 1 << TXC0;  // mark transmission not complete
+while (!(UCSR0A & (1 << TXC0)));   // Wait for the transmission to complete
+            digitalWrite(9, LOW);
+            digitalWrite(13, LOW);
             break;
           default:
 //            Serial.println("def05");
@@ -51,8 +74,16 @@ void loop() {
         }}
         break;
       case 0x04:
-        Serial.println("04");
+        digitalWrite(9, HIGH);
+        digitalWrite(13, HIGH);
+        Serial485.println("04");
         i = "";
+//delayMicroseconds (660);
+while (!(UCSR0A & (1 << UDRE0)))  // Wait for empty transmit buffer
+UCSR0A |= 1 << TXC0;  // mark transmission not complete
+while (!(UCSR0A & (1 << TXC0)));   // Wait for the transmission to complete
+        digitalWrite(9, LOW);
+        digitalWrite(13, LOW);
         break;
       default:
 //        Serial.println("default");
