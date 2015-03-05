@@ -1,139 +1,129 @@
 #include <avr/pgmspace.h>
-#include <SoftwareSerial.h>
-SoftwareSerial Serial485_1(8, 9);
-SoftwareSerial Serial485_2(10, 11);
 const PROGMEM char forward[] =  {0x05, 0x10, 0x00, 0x00, 0x00, 0x01, 0x02, 0x00, 0x01, 0x55, 0x50};
 const PROGMEM char backward[] = {0x05, 0x10, 0x00, 0x00, 0x00, 0x01, 0x02, 0x00, 0x02, 0x15, 0x51};
 const PROGMEM char freq10[] =   {0x05, 0x10, 0x00, 0x01, 0x00, 0x01, 0x02, 0x03, 0xE8, 0x95, 0xFF};
 const PROGMEM char freq15[] =   {0x05, 0x10, 0x00, 0x01, 0x00, 0x01, 0x02, 0x05, 0xDC, 0x97, 0x88};
 const PROGMEM char stay[] =     {0x05, 0x10, 0x00, 0x00, 0x00, 0x01, 0x02, 0x00, 0x00, 0x94, 0x90};
 
+#include <SoftwareSerial.h>
+SoftwareSerial SerialMaster(8, 9);
+SoftwareSerial SerialSlave(10, 11);
+
+int mEn = 7;
+int sEn = 12;
+int led = 13;
+
 int k;
 char b;
 char output;
-String i;
+String input;
 
 void setup() {
-  pinMode(7, OUTPUT);
-  pinMode(12, OUTPUT);
-  pinMode(13, OUTPUT);
-  digitalWrite(7, LOW);
-  digitalWrite(12, LOW);
-  digitalWrite(13, LOW);
+  pinMode(mEn, OUTPUT);
+  pinMode(sEn, OUTPUT);
+  pinMode(led, OUTPUT);
+  digitalWrite(mEn, LOW);
+  digitalWrite(sEn, LOW);
+  digitalWrite(led, LOW);
   Serial.begin(9600);
-  Serial485_1.begin(9600);
-  Serial485_2.begin(9600);
+  SerialSlave.begin(9600);
+  SerialMaster.begin(9600);
 }
 
 void loop() {
 
- /* 
-  while (Serial485_1.available()) {
-    b = Serial485_1.read();
-    i += b;
-
-    switch (i.charAt(0)) {
+  while (SerialMaster.available()) {
+    b = SerialMaster.read();
+    input += b;
+    switch (input.charAt(0)) {
       case 0x05:
-        if (i.length() == 2) { 
-        switch (i.charAt(1)) {
-          case 0x10:
-            digitalWrite(12, HIGH);
-            digitalWrite(13, HIGH);
-            for (k = 0; k < 11; k++) {
-              output = pgm_read_word_near(forward + k);
-              Serial.print(output);
-//              Serial485_2.print(output);
-            }  
-            i = "";
-//delayMicroseconds (660);
-while (!(UCSR0A & (1 << UDRE0)))  // Wait for empty transmit buffer
-UCSR0A |= 1 << TXC0;  // mark transmission not complete
-while (!(UCSR0A & (1 << TXC0)));   // Wait for the transmission to complete
-            digitalWrite(12, LOW);
-            digitalWrite(13, LOW);
-            break;
-          case 0x00:
-            digitalWrite(12, HIGH);
-            digitalWrite(13, HIGH);
-            for (k = 0; k < 11; k++) {
-              output = pgm_read_word_near(backward + k);
-              Serial.print(output);
-//              Serial485_2.print(output);
-            } 
-            i = "";
-//delayMicroseconds (660);
-while (!(UCSR0A & (1 << UDRE0)))  // Wait for empty transmit buffer
-UCSR0A |= 1 << TXC0;  // mark transmission not complete
-while (!(UCSR0A & (1 << TXC0)));   // Wait for the transmission to complete
-            digitalWrite(12, LOW);
-            digitalWrite(13, LOW);
-            break;
-          default:
-            i = "";
-        }}
-        break;
+        if (input.length() == 2) { 
+          switch (input.charAt(1)) {
+            case 0x00:
+              sendSlave(stay, 11);
+              break;
+            case 0x01:
+              sendSlave(forward, 11);
+              break;
+            case 0x02:
+              sendSlave(backward, 11);
+              break;
+            default:
+              Serial.print("mIn" + input);
+              input = "";
+          }
+        }
+        break;        
       default:
-        i = "";
-    }   
-  } 
-
-*/
-
-
-//----------------------------------------------
-  
-  while (Serial485_1.available()) {
-    b = Serial485_1.read();
-    i += b;
-
-    switch (i.charAt(0)) {
-      case 0x05:
-        digitalWrite(12, HIGH);
-        digitalWrite(13, HIGH);
-        for (k = 0; k < 11; k++) {
-          output = pgm_read_word_near(stay + k);
-          Serial.print(output);
-          Serial485_2.print(output);
-        }        
-        i = "";
-//delayMicroseconds (660);
-while (!(UCSR0A & (1 << UDRE0)))  // Wait for empty transmit buffer
-UCSR0A |= 1 << TXC0;  // mark transmission not complete
-while (!(UCSR0A & (1 << TXC0)));   // Wait for the transmission to complete
-        digitalWrite(12, LOW);
-        digitalWrite(13, LOW);
-        break;
-      default:
-        i = "";
-    }   
-  }
-
-//----------------------------------------------
-  
-  while (Serial485_2.available()) {
-    b = Serial485_2.read();
-    i += b;
-
-    switch (i.charAt(0)) {
-      case 0x04:
-        digitalWrite(7, HIGH);
-        digitalWrite(13, HIGH);
-        for (k = 0; k < 11; k++) {
-          output = pgm_read_word_near(stay + k);
-          Serial.print(output);
-          Serial485_1.print(output);
-        }        
-        i = "";
-//delayMicroseconds (660);
-while (!(UCSR0A & (1 << UDRE0)))  // Wait for empty transmit buffer
-UCSR0A |= 1 << TXC0;  // mark transmission not complete
-while (!(UCSR0A & (1 << TXC0)));   // Wait for the transmission to complete
-        digitalWrite(7, LOW);
-        digitalWrite(13, LOW);
-        break;
-      default:
-        i = "";
+        Serial.print("mIn" + input);
+        input = "";
     }   
   }
   
+  while (SerialSlave.available()) {
+    b = SerialSlave.read();
+    input += b;
+    switch (input.charAt(0)) {
+      case 0x05:
+        if (input.length() == 2) { 
+          switch (input.charAt(1)) {
+            case 0x00:
+              sendMaster(freq10, 11);
+              break;
+            case 0x01:
+              sendMaster(freq15, 11);
+              break;
+            default:
+              Serial.print("sIn" + input);
+              input = "";
+              SerialMaster.listen();
+          }
+        }
+        break;        
+      default:
+        Serial.print("sIn" + input);
+        input = "";
+        SerialMaster.listen();
+    }
+  }
+}
+
+void sendSlave (const char* h, int n){
+  Serial.print("mIn" + input);
+  input = "";
+  digitalWrite(sEn, HIGH);
+  digitalWrite(led, HIGH);
+  Serial.print("sOut");
+  for (k = 0; k < n; k++) {
+    output = pgm_read_word_near(h + k);
+    SerialSlave.print(output);
+    Serial.print(output);
+  }       
+  SerialSlave.listen();
+  //delayMicroseconds (660);
+  while (!(UCSR0A & (1 << UDRE0)))  // Wait for empty transmit buffer
+  UCSR0A |= 1 << TXC0;              // mark transmission not complete
+  while (!(UCSR0A & (1 << TXC0)));  // Wait for the transmission to complete
+  digitalWrite(sEn, LOW);
+  digitalWrite(led, LOW);
+}
+
+void sendMaster (const char* h, int n){
+  Serial.print("sIn" + input);
+  input = "";
+  digitalWrite(mEn, HIGH);
+  digitalWrite(led, HIGH);
+  Serial.print("mOut");
+  for (k = 0; k < n; k++) {
+    output = pgm_read_word_near(h + k);
+    SerialMaster.print(output);
+    Serial.print(output);
+  }        
+  SerialMaster.listen();
+  //delayMicroseconds (660);
+  while (!(UCSR0A & (1 << UDRE0)))  // Wait for empty transmit buffer
+  UCSR0A |= 1 << TXC0;              // mark transmission not complete
+  while (!(UCSR0A & (1 << TXC0)));  // Wait for the transmission to complete
+  digitalWrite(mEn, LOW);
+  digitalWrite(led, LOW);  
 }
