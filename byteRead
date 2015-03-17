@@ -1,0 +1,40 @@
+char m[3] = {0x89, 0x00, 0x99};
+char n[15];
+//String u = String(0x89) + String(0x99);
+
+void setup() {
+  Serial.begin(9600);
+  Serial.setTimeout(2);
+}
+
+void loop() {
+  while (Serial.available()) {
+  Serial.readBytes(n, 15);
+//  Serial.readBytesUntil(m, n, 15);
+//  bool h = Serial.find(m);
+  if (n[0] == m[0] && n[1] == m[1] && n[2] == m[2]) {
+//  if (h == true) {
+    Serial.print("if");
+    Serial.write(n, 3);
+  }
+  else {
+    Serial.print("else");
+    Serial.write(n, 3);
+  }
+
+/*
+http://podrugomu.com/node/987
+
+flaot buf[100];
+int pos = 0;
+
+void loop()
+{
+ buf[pos++] = analogRead(1);
+delay(100);
+ if(pos == 99) pos = 0;
+}
+*/
+
+  }
+}
