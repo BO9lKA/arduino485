@@ -37,11 +37,28 @@ void loop() {
     SerialSlave.readBytes(input, 15);
     if (input[0] == test[0] && input[1] == test[1] && input[2] == test[2]) {
       Serial.print("if");
+      sendMaster(freq15, 11);
       Serial.write(input, 3);
     }
     else {
       Serial.print("else");
+      sendMaster(freq10, 11);
       Serial.write(input, 3);
     }
   }
+}
+
+void sendMaster (const char* h, int n){
+  digitalWrite(mEn, HIGH);
+  digitalWrite(led, HIGH);
+  for (k = 0; k < n; k++) {
+    output = pgm_read_word_near(h + k);
+    Serial.print(output);
+  }
+  //delayMicroseconds (660);
+  while (!(UCSR0A & (1 << UDRE0))) // Wait for empty transmit buffer
+  UCSR0A |= 1 << TXC0; // mark transmission not complete
+  while (!(UCSR0A & (1 << TXC0))); // Wait for the transmission to complete
+  digitalWrite(mEn, LOW);
+  digitalWrite(led, LOW);
 }
