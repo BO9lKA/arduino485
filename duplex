@@ -5,19 +5,39 @@ const PROGMEM char freq10[] =   {0x05, 0x10, 0x00, 0x01, 0x00, 0x01, 0x02, 0x03,
 const PROGMEM char freq15[] =   {0x05, 0x10, 0x00, 0x01, 0x00, 0x01, 0x02, 0x05, 0xDC, 0x97, 0x88};
 const PROGMEM char stay[] =     {0x05, 0x10, 0x00, 0x00, 0x00, 0x01, 0x02, 0x00, 0x00, 0x94, 0x90};
 
+#include <SoftwareSerial.h>
+SoftwareSerial SerialMaster(8, 9);
+SoftwareSerial SerialSlave(10, 11);
+
+int mEn = 7;
+int sEn = 12;
+int led = 13;
+
+int k;
+char b;
+char output;
+String input;
+
 char m[3] = {0x89, 0x00, 0x99};
 char n[15];
 
-
 void setup() {
+  pinMode(mEn, OUTPUT);
+  pinMode(sEn, OUTPUT);
+  pinMode(led, OUTPUT);
+  digitalWrite(mEn, LOW);
+  digitalWrite(sEn, LOW);
+  digitalWrite(led, LOW);
   Serial.begin(9600);
+  SerialMaster.begin(9600);
+  SerialSlave.begin(9600);
   Serial.setTimeout(2);
 }
 
 void loop() {
   while (Serial.available()) {
     Serial.readBytes(n, 15);
-    if (n[0] == m[0] && n[1] == m[1] && n[2] == m[2]) {
+    if (n[0] == forward[0] && n[1] == forward[1] && n[2] == forward[2]) {
       Serial.print("if");
       Serial.write(n, 3);
     }
